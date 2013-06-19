@@ -76,7 +76,7 @@ module.exports.clean = function (config, next) {
     files.forEach(function (file) {
       var key = file.split('-')
       
-      if (key[0] !== 'manifest.json' && key[0] !== all[key[1]])
+      if (key[0][0] !== '.' && key[0] !== 'manifest.json' && key[0] !== all[key[1]])
         fs.unlink(path.join(out, file), f.slot())
     })
   }).onComplete(next)
