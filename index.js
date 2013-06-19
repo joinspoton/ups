@@ -2,21 +2,31 @@ var async = require('async')
   , crypto = require('crypto')
   , ff = require('ff')
   , fs = require('fs')
+  , path = require('path')
 
-module.exports.build = function (base, minify, next) {
-  var assets = require(base + '/assets.json')
+module.exports.build = function (config, minify, next) {
+  var assets = require(config)
     , manifest = {
           css: {}
         , js: {}
         , all: {}
       }
   
+  config = path.dirname(config)
+  config = {
+      src: path.join(config, assets._src)
+    , out: path.join(config, assets._out)
+    , web: assets._web
+  }
+  
   async.eachSeries(Object.keys(assets), function (group, next) {
+    if (!Array.isArray(assets[group])) return setImmediate(next)
+    
     async.eachSeries(assets[group], function (file, next) {
-      var proc = require('./types/' + file.match(/(.+)\.(.+)/)[2])
+      var proc = require('./types/' + path.extname(file).slice(1))
       
       var f = ff(function () {
-        fs.readFile(base + '/' + file, 'utf8', f.slot())
+        fs.readFile(path.join(config.src, file), 'utf8', f.slot())
       }, function (data) {
         proc.render(file, data, f.slot())
       }, function (data) {
@@ -36,37 +46,38 @@ module.exports.build = function (base, minify, next) {
         
         if (css) {
           var csssum = crypto.createHash('md5').update(css).digest('hex')
-          manifest.css[group] = '<link rel="stylesheet" href="/parcel/' + csssum + '-' + group + '.css">';
+          manifest.css[group] = '<link rel="stylesheet" href="' + config.web + '/' + csssum + '-' + group + '.css">';
           manifest.all[group + '.css'] = csssum
-          fs.writeFile(base + '/public/parcel/' + csssum + '-' + group + '.css', css, f.slot())
+          fs.writeFile(path.join(config.out, csssum + '-' + group + '.css'), css, f.slot())
         }
         
         if (js) {
           var jssum = crypto.createHash('md5').update(js).digest('hex')
-          manifest.js[group] = '<script src="/parcel/' + csssum + '-' + group + '.js"></script>';
+          manifest.js[group] = '<script src="' + config.web + '/' + jssum + '-' + group + '.js"></script>';
           manifest.all[group + '.js'] = jssum
-          fs.writeFile(base + '/public/parcel/' + jssum + '-' + group + '.js', js, f.slot())
+          fs.writeFile(path.join(config.out, jssum + '-' + group + '.js'), js, f.slot())
         }
       }).onComplete(next)
     })
   }, function (err) {
     if (err) return next(err)
     
-    fs.writeFile(base + '/public/parcel/manifest.json', JSON.stringify(manifest), next)
+    fs.writeFile(path.join(config.out, 'manifest.json'), JSON.stringify(manifest), next)
   })
 }
 
-module.exports.clean = function (base, next) {
-  var groups = require(base + '/public/parcel/manifest.json').all
+module.exports.clean = function (config, next) {
+  var out = path.join(path.dirname(config), require(config)._out)
+    , all = require(path.join(out, 'manifest.json')).all
   
   var f = ff(function () {
-    fs.readdir(base, f.slot())
+    fs.readdir(out, f.slot())
   }, function (files) {
     files.forEach(function (file) {
       var key = file.split('-')
       
-      if (key[0] !== 'manifest.json' && key[0] !== groups[key[1]])
-        fs.unlink(base + '/' + file, f.slot())
+      if (key[0] !== 'manifest.json' && key[0] !== all[key[1]])
+        fs.unlink(path.join(out, file), f.slot())
     })
   }).onComplete(next)
 }
