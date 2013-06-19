@@ -45,14 +45,14 @@ module.exports.build = function (config, minify, next) {
           , js = manifest.js[group]
         
         if (css) {
-          var csssum = crypto.createHash('md5').update(css).digest('hex').slice(10)
+          var csssum = crypto.createHash('md5').update(css).digest('hex').slice(0, 10)
           manifest.css[group] = '<link rel=\'stylesheet\' href=\'' + config.web + '/' + csssum + '-' + group + '.css\'>';
           manifest.all[group + '.css'] = csssum
           fs.writeFile(path.join(config.out, csssum + '-' + group + '.css'), css, f.slot())
         }
         
         if (js) {
-          var jssum = crypto.createHash('md5').update(js).digest('hex').slice(10)
+          var jssum = crypto.createHash('md5').update(js).digest('hex').slice(0, 10)
           manifest.js[group] = '<script src=\'' + config.web + '/' + jssum + '-' + group + '.js\'></script>';
           manifest.all[group + '.js'] = jssum
           fs.writeFile(path.join(config.out, jssum + '-' + group + '.js'), js, f.slot())
