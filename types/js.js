@@ -7,7 +7,7 @@ module.exports.render = function (file, data, next) {
 }
 
 module.exports.minify = function (file, data, next) {
-  data = uglify.minify(data, { fromString: true })
+  data = uglify.minify(data, { fromString: true }).code
   
   next(null, data)
 }
