@@ -22,6 +22,9 @@ module.exports.build = function (config, minify, next) {
   async.eachSeries(Object.keys(assets), function (group, next) {
     if (!Array.isArray(assets[group])) return setImmediate(next)
     
+    var hash = { css: '', js: '' }
+      , dist = { css: '', js: '' }
+    
     async.eachSeries(assets[group], function (file, next) {
       var proc = require('./types/' + path.extname(file).slice(1))
       
@@ -30,32 +33,31 @@ module.exports.build = function (config, minify, next) {
       }, function (data) {
         proc.render(file, data, f.slot())
       }, function (data) {
+        hash[proc.type] += crypto.createHash('md5').update(data).digest('hex')
+        
         if (minify)
           proc.minify(file, data, f.slot())
         else
           f.pass(data)
       }, function (data) {
-        manifest[proc.type][group] = (manifest[proc.type][group] || '') + data
+        dist[proc.type] += data
       }).onComplete(next)
     }, function (err) {
       if (err) return next(err)
       
       var f = ff(function () {
-        var css = manifest.css[group]
-          , js = manifest.js[group]
-        
-        if (css) {
-          var csssum = crypto.createHash('md5').update(css).digest('hex').slice(0, 10)
-          manifest.css[group] = '<link rel=\'stylesheet\' href=\'' + config.web + '/' + csssum + '-' + group + '.css\'>';
-          manifest.all[group + '.css'] = csssum
-          fs.writeFile(path.join(config.out, csssum + '-' + group + '.css'), css, f.slot())
+        if (hash.css) {
+          hash.css = crypto.createHash('md5').update(hash.css).digest('hex').slice(0, 10)
+          manifest.css[group] = '<link rel=\'stylesheet\' href=\'' + config.web + '/' + hash.css + '-' + group + '.css\'>';
+          manifest.all[group + '.css'] = hash.css
+          fs.writeFile(path.join(config.out, hash.css + '-' + group + '.css'), dist.css, f.slot())
         }
         
-        if (js) {
-          var jssum = crypto.createHash('md5').update(js).digest('hex').slice(0, 10)
-          manifest.js[group] = '<script src=\'' + config.web + '/' + jssum + '-' + group + '.js\'></script>';
-          manifest.all[group + '.js'] = jssum
-          fs.writeFile(path.join(config.out, jssum + '-' + group + '.js'), js, f.slot())
+        if (hash.js) {
+          hash.js = crypto.createHash('md5').update(hash.js).digest('hex').slice(0, 10)
+          manifest.js[group] = '<script src=\'' + config.web + '/' + hash.js + '-' + group + '.js\'></script>';
+          manifest.all[group + '.js'] = hash.js
+          fs.writeFile(path.join(config.out, hash.js + '-' + group + '.js'), dist.js, f.slot())
         }
       }).onComplete(next)
     })
