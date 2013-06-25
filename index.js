@@ -5,7 +5,7 @@ var async = require('async')
   , path = require('path')
 
 module.exports.build = function (config, minify, next) {
-  var assets = require(config)
+  var assets = JSON.parse(fs.readFileSync(config, 'utf8'))
     , manifest = {
           css: {}
         , js: {}
@@ -69,8 +69,8 @@ module.exports.build = function (config, minify, next) {
 }
 
 module.exports.clean = function (config, next) {
-  var out = path.join(path.dirname(config), require(config)._out)
-    , all = require(path.join(out, 'manifest.json')).all
+  var out = path.join(path.dirname(config), JSON.parse(fs.readFileSync(config, 'utf8'))._out)
+    , all = JSON.parse(fs.readFileSync(path.join(out, 'manifest.json'), 'utf8')).all
   
   var f = ff(function () {
     fs.readdir(out, f.slot())
