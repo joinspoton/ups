@@ -1,7 +1,7 @@
 {
     "name": "ups"
   , "version": "0.1.0"
-  , "description": "Universal parcel service for building assets."
+  , "description": "Universal parcel service for asset building."
   , "homepage": "https://github.com/joinspoton/parcel"
   , "bugs": "https://github.com/joinspoton/parcel/issues"
   , "license": "MIT"
