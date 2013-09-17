@@ -1,8 +1,9 @@
-var nib = require('nib')
-  , stylus = require('stylus')
-  , css = require('./css')
+var nib = require('nib');
+var stylus = require('stylus');
 
-module.exports.type = css.type
+var css = require('./css');
+
+module.exports.type = css.type;
 
 module.exports.render = function (file, data, next) {
   stylus(data)
@@ -10,10 +11,12 @@ module.exports.render = function (file, data, next) {
     .use(nib())
     .import('nib')
     .render(function (err, data) {
-      if (err) return next(err)
+      if (err) {
+      	return next(err);
+      }
       
-      css.render(file, data, next)
-    })
-}
+      css.render(file, data, next);
+    });
+};
 
-module.exports.minify = css.minify
+module.exports.minify = css.minify;
