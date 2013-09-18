@@ -4,6 +4,11 @@ var ff = require('ff');
 var fs = require('fs');
 var path = require('path');
 
+module.exports.types = {
+    css: require('./types/css')
+  , js: require('./types/js')
+};
+
 module.exports.build = function (config, minify, next) {
   var assets = JSON.parse(fs.readFileSync(config, 'utf8'));
   var manifest = {
@@ -28,7 +33,7 @@ module.exports.build = function (config, minify, next) {
     var dist = { css: '', js: '' };
     
     async.eachSeries(assets[group], function (file, next) {
-      var proc = require('./types/' + path.extname(file).slice(1));
+      var proc = module.exports.types[path.extname(file).slice(1)];
       
       var f = ff(function () {
         fs.readFile(path.join(config.src, file), 'utf8', f.slot());
