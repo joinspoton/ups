@@ -37,7 +37,7 @@ At SpotOn, we have a production deployer running UPS. After pulling an app, it b
 * Everything else should be groups of files relative to the config.
 
 `ups.types`  
-Object of supported file types and their handlers. `css` and `js` are enabled by default. `styl` can be loaded via `require('ups/types/...')`. Supports custom types; each should have a `type`, `render(file, data, next)`, and `minify(file, data, next)`.
+Object of supported file types and their handlers. `css` and `js` are enabled by default. `stylus` can be loaded via `require('ups/types/...')`. Supports custom types; each should have a `type`, `render(file, data, next)`, and `minify(file, data, next)`.
 
 `ups.build(config, minify, next)`  
 Builds assets, optionally `minify`ing them in the process. Writes the resulting files and `manifest.json` to `_out`.
