@@ -22,6 +22,10 @@ module.exports.build = function (config, minify, next) {
       src: path.join(config, assets._src)
     , out: path.join(config, assets._out)
     , web: assets._web
+    , str: {
+          css: (assets._str && assets._str.css) || '<link rel=\'stylesheet\' href=\'%%\'>'
+        , js: (assets._str && assets._str.js) || '<script src=\'%%\'></script>'
+      }
   };
   
   async.eachSeries(Object.keys(assets), function (group, next) {
@@ -58,14 +62,14 @@ module.exports.build = function (config, minify, next) {
       var f = ff(function () {
         if (hash.css) {
           hash.css = crypto.createHash('md5').update(hash.css).digest('hex').slice(0, 10);
-          manifest.css[group] = '<link rel=\'stylesheet\' href=\'' + config.web + '/' + hash.css + '-' + group + '.css\'>';
+          manifest.css[group] = config.str.css.replace('%%', config.web + '/' + hash.css + '-' + group + '.css');
           manifest.all[group + '.css'] = hash.css;
           fs.writeFile(path.join(config.out, hash.css + '-' + group + '.css'), dist.css, f.slot());
         }
         
         if (hash.js) {
           hash.js = crypto.createHash('md5').update(hash.js).digest('hex').slice(0, 10);
-          manifest.js[group] = '<script src=\'' + config.web + '/' + hash.js + '-' + group + '.js\'></script>';
+          manifest.js[group] = config.str.js.replace('%%', config.web + '/' + hash.js + '-' + group + '.js');
           manifest.all[group + '.js'] = hash.js;
           fs.writeFile(path.join(config.out, hash.js + '-' + group + '.js'), dist.js, f.slot());
         }
