@@ -12,7 +12,7 @@ module.exports.render = function (file, data, next) {
     .import('nib')
     .render(function (err, data) {
       if (err) {
-      	return next(err);
+        return next(err);
       }
       
       css.render(file, data, next);

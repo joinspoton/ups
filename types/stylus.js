@@ -9,7 +9,7 @@ module.exports.render = function (file, data, next) {
     .set('filename', file)
     .render(function (err, data) {
       if (err) {
-      	return next(err);
+        return next(err);
       }
       
       css.render(file, data, next);
