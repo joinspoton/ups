@@ -44,14 +44,13 @@ module.exports.build = function (config, minify, next) {
       }, function (data) {
         proc.render(file, data, f.slot());
       }, function (data) {
-        hash[proc.type] += crypto.createHash('md5').update(data).digest('hex');
-        
         if (minify) {
           proc.minify(file, data, f.slot());
         } else {
           f.pass(data);
         }
       }, function (data) {
+        hash[proc.type] += crypto.createHash('md5').update(data).digest('hex');
         dist[proc.type] += data;
       }).onComplete(next);
     }, function (err) {
