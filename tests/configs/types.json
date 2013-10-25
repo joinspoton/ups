@@ -1,0 +1,29 @@
+{
+    "_src": "../sources"
+  , "_out": "../publics"
+  , "_web": "/ups"
+  , "global": [
+        "reset.css"
+      , "jquery.js"
+      , "handlebars.js"
+      , "ember.js"
+    ]
+  , "coffeescript": [
+        "coffeescript.coffee"
+    ]
+  , "handlebars": [
+        "handlebars.handlebars"
+    ]
+  , "ember": [
+        "ember.hbs"
+    ]
+  , "less": [
+        "less.less"
+    ]
+  , "stylus": [
+        "stylus.stylus"
+    ]
+  , "nib": [
+        "nib.styl"
+    ]
+}

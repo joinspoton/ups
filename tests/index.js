@@ -1,5 +1,6 @@
 var assert = require('assert');
 var ff = require('ff');
+var fs = require('fs');
 var ups = require('ups');
 
 describe('ups.build()', function () {
@@ -13,7 +14,15 @@ describe('ups.build()', function () {
 });
 
 describe('ups.clean()', function () {
-  it('should delete extraneous files');
+  it('should delete extraneous files', function (next) {
+    var f = ff(function () {
+      ups.clean('', f.wait());
+    }, function () {
+      fs.readdir('', f.slot());
+    }, function (list) {
+      assert.deepEqual(list, []);
+    }).onComplete(next);
+  });
   
   it('should ignore valid assets');
   

@@ -1,0 +1,13 @@
+{
+    "_src": "../sources"
+  , "_out": "../publics"
+  , "_web": "/ups"
+  , "_str": {
+        "css": "%%"
+      , "js": "%%"
+    }
+  , "global": [
+        "css.css"
+      , "js.js"
+    ]
+}

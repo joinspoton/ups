@@ -63,14 +63,14 @@ module.exports.build = function (config, minify, next) {
           hash.css = crypto.createHash('md5').update(hash.css).digest('hex').slice(0, 10);
           manifest.css[group] = config.str.css.replace('%%', config.web + '/' + hash.css + '-' + group + '.css');
           manifest.all[group + '.css'] = hash.css;
-          fs.writeFile(path.join(config.out, hash.css + '-' + group + '.css'), dist.css, f.slot());
+          fs.writeFile(path.join(config.out, hash.css + '-' + group + '.css'), dist.css, f.wait());
         }
         
         if (hash.js) {
           hash.js = crypto.createHash('md5').update(hash.js).digest('hex').slice(0, 10);
           manifest.js[group] = config.str.js.replace('%%', config.web + '/' + hash.js + '-' + group + '.js');
           manifest.all[group + '.js'] = hash.js;
-          fs.writeFile(path.join(config.out, hash.js + '-' + group + '.js'), dist.js, f.slot());
+          fs.writeFile(path.join(config.out, hash.js + '-' + group + '.js'), dist.js, f.wait());
         }
       }).onComplete(next);
     });
@@ -94,7 +94,7 @@ module.exports.clean = function (config, next) {
       var key = file.split('-');
       
       if (key[0][0] !== '.' && key[0] !== 'manifest.json' && key[0] !== all[key[1]]) {
-        fs.unlink(path.join(out, file), f.slot());
+        fs.unlink(path.join(out, file), f.wait());
       }
     });
   }).onComplete(next);
