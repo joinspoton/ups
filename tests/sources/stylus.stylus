@@ -1,0 +1,12 @@
+fonts = helvetica, arial, sans-serif
+
+body {
+  padding: 50px;
+  font: 14px/1.4 fonts;
+}
+
+textarea
+input
+  color #A7A7A7
+  &:hover
+    color #000
