@@ -1,16 +1,16 @@
 var assert = require('assert');
-var crypto = require('crypto');
+var async = require('async');
 var ff = require('ff');
 var shell = require('shelljs');
 var ups = require('..');
 
-var hash = function (data) {
-  return crypto.createHash('md5').update(data).digest('hex');
+var files = {
+    basic: {"css":{},"js":{"global":"<script src='/ups/3a32d3bc8e-global.js'></script>"},"all":{"global.js":"3a32d3bc8e"}}
+  , basicMin: {"css":{},"js":{"global":"<script src='/ups/dbe4fdaf47-global.js'></script>"},"all":{"global.js":"dbe4fdaf47"}}
 };
 
 before(function () {
   shell.cd(__dirname);
-  shell.rm('-r', 'publics');
   shell.mkdir('publics');
 });
 
@@ -19,15 +19,44 @@ after(function () {
 });
 
 describe('ups.build()', function () {
-  it('should create assets');
+  this.timeout(0);
   
-  it('should create the manifest');
+  it('should create assets and the manifest', function (next) {
+    var f = ff(function () {
+      ups.build(__dirname + '/configs/basic.json', false, f.wait());
+    }, function () {
+      assert.deepEqual(JSON.parse(shell.cat('publics/manifest.json')), files.basic);
+    }).onComplete(next);
+  });
   
-  it('should customize group strings');
+  it('should compress assets', function (next) {
+    var f = ff(function () {
+      ups.build(__dirname + '/configs/basic.json', true, f.wait());
+    }, function () {
+      assert.deepEqual(JSON.parse(shell.cat('publics/manifest.json')), files.basicMin);
+    }).onComplete(next);
+  });
   
-  it('should compress assets');
+  it('should be deterministic', function (next) {
+    async.timesSeries(10, function (n, next) {
+      var f = ff(function () {
+        ups.build(__dirname + '/configs/basic.json', false, f.wait());
+      }, function () {
+        assert.deepEqual(JSON.parse(shell.cat('publics/manifest.json')), files.basic);
+      }).onComplete(next);
+    }, next);
+  });
   
-  it('should be deterministic');
+  it('should customize group strings', function (next) {
+    var f = ff(function () {
+      ups.build(__dirname + '/configs/gstrs.json', false, f.wait());
+    }, function () {
+      var manifest = JSON.parse(shell.cat('publics/manifest.json'));
+      
+      assert.equal(manifest.css.global, '/ups/3672c5f0b6-global.css');
+      assert.equal(manifest.js.global, '/ups/e3265f70cc-global.js');
+    }).onComplete(next);
+  });
 });
 
 describe('ups.clean()', function () {
