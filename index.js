@@ -39,6 +39,10 @@ module.exports.build = function (config, minify, next) {
     async.eachSeries(assets[group], function (file, next) {
       var proc = module.exports.types[path.extname(file).slice(1)];
       
+      if (!proc) {
+        return next('no type for ' + file);
+      }
+      
       var f = ff(function () {
         fs.readFile(path.join(config.src, file), 'utf8', f.slot());
       }, function (data) {
