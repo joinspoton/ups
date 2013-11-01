@@ -27,6 +27,7 @@
       , "nib": "~1.0.1"
       , "shelljs": "~0.2.6"
       , "stylus": "~0.38.0"
+      , "test-fixtures": "~1.0.0"
     }
   , "engines": {
         "node": "~0.10.20"
