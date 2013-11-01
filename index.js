@@ -33,9 +33,6 @@ module.exports.build = function (config, minify, next) {
       return setImmediate(next);
     }
     
-    var hash = { css: '', js: '' };
-    var dist = { css: '', js: '' };
-    
     async.eachSeries(assets[group], function (file, next) {
       var proc = module.exports.types[path.extname(file).slice(1)];
       
@@ -54,8 +51,7 @@ module.exports.build = function (config, minify, next) {
           f.pass(data);
         }
       }, function (data) {
-        hash[proc.type] += crypto.createHash('md5').update(data).digest('hex');
-        dist[proc.type] += data;
+        manifest[proc.type][group] = (manifest[proc.type][group] || '') + data;
       }).onComplete(next);
     }, function (err) {
       if (err) {
@@ -63,18 +59,21 @@ module.exports.build = function (config, minify, next) {
       }
       
       var f = ff(function () {
-        if (hash.css) {
-          hash.css = crypto.createHash('md5').update(hash.css).digest('hex').slice(0, 10);
-          manifest.css[group] = config.str.css.replace('%%', config.web + '/' + hash.css + '-' + group + '.css');
-          manifest.all[group + '.css'] = hash.css;
-          fs.writeFile(path.join(config.out, hash.css + '-' + group + '.css'), dist.css, f.wait());
+        var distcss = manifest.css[group];
+        var distjs = manifest.js[group];
+        
+        if (distcss) {
+          var hashcss = crypto.createHash('md5').update(distcss).digest('hex').slice(0, 10);
+          manifest.css[group] = config.str.css.replace('%%', config.web + '/' + hashcss + '-' + group + '.css');
+          manifest.all[group + '.css'] = hashcss;
+          fs.writeFile(path.join(config.out, hashcss + '-' + group + '.css'), distcss, f.wait());
         }
         
-        if (hash.js) {
-          hash.js = crypto.createHash('md5').update(hash.js).digest('hex').slice(0, 10);
-          manifest.js[group] = config.str.js.replace('%%', config.web + '/' + hash.js + '-' + group + '.js');
-          manifest.all[group + '.js'] = hash.js;
-          fs.writeFile(path.join(config.out, hash.js + '-' + group + '.js'), dist.js, f.wait());
+        if (distjs) {
+          var hashjs = crypto.createHash('md5').update(distjs).digest('hex').slice(0, 10);
+          manifest.js[group] = config.str.js.replace('%%', config.web + '/' + hashjs + '-' + group + '.js');
+          manifest.all[group + '.js'] = hashjs;
+          fs.writeFile(path.join(config.out, hashjs + '-' + group + '.js'), distjs, f.wait());
         }
       }).onComplete(next);
     });
