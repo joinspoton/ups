@@ -25,6 +25,10 @@ At SpotOn, we have a production deployer running UPS. After pulling an app, it b
         "_src": ""
       , "_out": ""
       , "_web": ""
+      , "_str": {
+            "css": "<link rel='stylesheet' href='%%'>"
+          , "js": "<script src='%%'></script>"
+        }
       , "group1": []
       , "group2": []
       , "groupx": []
@@ -34,10 +38,11 @@ At SpotOn, we have a production deployer running UPS. After pulling an app, it b
 * `_src` is the file base path relative to the config. We suggest `""`.
 * `_out` is the file output path relative to the config. We suggest `"public/ups"`.
 * `_web` is the web base path. We suggest `"/ups"`.
-* Everything else should be groups of files relative to the config.
+* `_str` are the group strings. We suggest leaving these out.
+* Everything else should be groups of files relative to `_src`.
 
 `ups.types`  
-Object of supported file types and their handlers. `css` and `js` are enabled by default. `stylus` and `handlebars` can be loaded via `require('ups/types/...')`. Supports custom types; each should have a `type`, `render(file, data, next)`, and `minify(file, data, next)`.
+Object of supported file types and their handlers. Supports custom types; each should have a `type`, `render(file, data, next)`, and `minify(file, data, next)`. Load any of the following with `require('ups/types/...')`: `coffeescript`, `handlebars`, `handlebars-ember`, `less`, `stylus`, `stylus-nib`.
 
 `ups.build(config, minify, next)`  
 Builds assets, optionally `minify`ing them in the process. Writes the resulting files and `manifest.json` to `_out`.
