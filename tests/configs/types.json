@@ -20,8 +20,14 @@
   , "less": [
         "less.less"
     ]
+  , "less_import": [
+        "less-import.less"
+    ]
   , "stylus": [
         "stylus.stylus"
+    ]
+  , "stylus_import": [
+        "stylus-import.stylus"
     ]
   , "nib": [
         "nib.styl"

@@ -41,7 +41,7 @@ var hashes = {
 var manifests = {
     basic: {"css":{"global":"<link rel='stylesheet' href='/ups/"+hashes.global_css+"-global.css'>","index":"<link rel='stylesheet' href='/ups/"+hashes.index_css+"-index.css'>"},"js":{"global":"<script src='/ups/"+hashes.global_js+"-global.js'></script>","index":"<script src='/ups/"+hashes.index_js+"-index.js'></script>"},"all":{"global.css":hashes.global_css,"global.js":hashes.global_js,"index.css":hashes.index_css,"index.js":hashes.index_js}}
   , basicMin: {"css":{"global":"<link rel='stylesheet' href='/ups/"+hashes.global_css_min+"-global.css'>","index":"<link rel='stylesheet' href='/ups/"+hashes.index_css_min+"-index.css'>"},"js":{"global":"<script src='/ups/"+hashes.global_js_min+"-global.js'></script>","index":"<script src='/ups/"+hashes.index_js_min+"-index.js'></script>"},"all":{"global.css":hashes.global_css_min,"global.js":hashes.global_js_min,"index.css":hashes.index_css_min,"index.js":hashes.index_js_min}}
-  , types: {"css":{"css":"<link rel='stylesheet' href='/ups/f13c2c05cf-css.css'>","less":"<link rel='stylesheet' href='/ups/b83abab1da-less.css'>","stylus":"<link rel='stylesheet' href='/ups/1349d685e3-stylus.css'>","nib":"<link rel='stylesheet' href='/ups/25169cfd91-nib.css'>"},"js":{"coffeescript":"<script src='/ups/4e68e71cbf-coffeescript.js'></script>","handlebars":"<script src='/ups/811452a0ba-handlebars.js'></script>","ember":"<script src='/ups/6428bda773-ember.js'></script>","js":"<script src='/ups/024f88cca3-js.js'></script>"},"all":{"coffeescript.js":"4e68e71cbf","css.css":"f13c2c05cf","handlebars.js":"811452a0ba","ember.js":"6428bda773","js.js":"024f88cca3","less.css":"b83abab1da","stylus.css":"1349d685e3","nib.css":"25169cfd91"}}
+  , types: {"css":{"css":"<link rel='stylesheet' href='/ups/f13c2c05cf-css.css'>","less":"<link rel='stylesheet' href='/ups/b83abab1da-less.css'>","less_import":"<link rel='stylesheet' href='/ups/b83abab1da-less_import.css'>","stylus":"<link rel='stylesheet' href='/ups/1349d685e3-stylus.css'>","stylus_import":"<link rel='stylesheet' href='/ups/a6e6c7f1c5-stylus_import.css'>","nib":"<link rel='stylesheet' href='/ups/25169cfd91-nib.css'>"},"js":{"coffeescript":"<script src='/ups/4e68e71cbf-coffeescript.js'></script>","handlebars":"<script src='/ups/811452a0ba-handlebars.js'></script>","ember":"<script src='/ups/6428bda773-ember.js'></script>","js":"<script src='/ups/024f88cca3-js.js'></script>"},"all":{"coffeescript.js":"4e68e71cbf","css.css":"f13c2c05cf","handlebars.js":"811452a0ba","ember.js":"6428bda773","js.js":"024f88cca3","less.css":"b83abab1da","less_import.css":"b83abab1da","stylus.css":"1349d685e3","stylus_import.css":"a6e6c7f1c5","nib.css":"25169cfd91"}}
 };
 
 describe('ups.build()', function () {
@@ -160,11 +160,19 @@ describe('ups/types', function () {
     it('should render LESS', function () {
       assert.equal(manifest.all['less.css'], manifests.types.all['less.css']);
     });
+    
+    it('should process imports', function () {
+      assert.equal(manifest.all['less_import.css'], manifests.types.all['less_import.css']);
+    });
   });
   
   describe('stylus', function () {
     it('should render Stylus', function () {
       assert.equal(manifest.all['stylus.css'], manifests.types.all['stylus.css']);
+    });
+    
+    it('should process imports', function () {
+      assert.equal(manifest.all['stylus_import.css'], manifests.types.all['stylus_import.css']);
     });
   });
   
