@@ -33,15 +33,16 @@ module.exports.build = function (config, minify, next) {
       return setImmediate(next);
     }
     
-    async.eachSeries(assets[group], function (file, next) {
-      var proc = module.exports.types[path.extname(file).slice(1)];
+    async.eachSeries(assets[group], function (name, next) {
+      var proc = module.exports.types[path.extname(name).slice(1)];
+      var file = path.join(config.src, name);
       
       if (!proc) {
-        return next('no type for ' + file);
+        return next('no type for ' + name);
       }
       
       var f = ff(function () {
-        fs.readFile(path.join(config.src, file), 'utf8', f.slot());
+        fs.readFile(file, 'utf8', f.slot());
       }, function (data) {
         proc.render(file, data, f.slot());
       }, function (data) {
