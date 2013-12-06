@@ -1,6 +1,6 @@
 {
     "name": "ups"
-  , "version": "1.0.0"
+  , "version": "1.0.1"
   , "description": "Universal parcel service for asset building."
   , "keywords": ["assets", "build", "cache", "compile", "compress", "minify"]
   , "homepage": "https://github.com/joinspoton/ups"
@@ -14,23 +14,23 @@
     }
   , "dependencies": {
         "async": "~0.2.9"
-      , "csso": "~1.3.9"
+      , "csso": "~1.3.10"
       , "ff": "~0.2.0"
-      , "uglify-js": "~2.4.1"
+      , "uglify-js": "~2.4.6"
     }
   , "devDependencies": {
         "coffee-script": "~1.6.3"
-      , "ember-handlebars": "~1.1.0"
-      , "handlebars": "~1.0.12"
-      , "less": "~1.5.0"
-      , "mocha": "~1.13.0"
+      , "ember-handlebars": "~1.2.0"
+      , "handlebars": "~1.1.2"
+      , "less": "~1.5.1"
+      , "mocha": "~1.15.1"
       , "nib": "~1.0.1"
       , "shelljs": "~0.2.6"
-      , "stylus": "~0.38.0"
+      , "stylus": "~0.41.0"
       , "test-fixtures": "~1.0.0"
     }
   , "engines": {
-        "node": "~0.10.20"
-      , "npm": "~1.3.10"
+        "node": "~0.10.22"
+      , "npm": "~1.3.14"
     }
 }
