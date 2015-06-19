@@ -55,7 +55,9 @@ module.exports.build = function (config, minify, next, type) {
       var proc = module.exports.types[path.extname(name).slice(1)];
       var file = path.join(config.src, name);
       if(type && path.extname(name).slice(1) !== type) {
-        return next();
+        if (!(path.extname(name).slice(1) === 'styl' && type === 'css')) {
+          return next();
+        }
       }
       
       if (!proc) {
