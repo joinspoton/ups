@@ -54,7 +54,7 @@ module.exports.build = function (config, minify, next, type) {
     async.eachSeries(assets[group], function (name, next) {
       var proc = module.exports.types[path.extname(name).slice(1)];
       var file = path.join(config.src, name);
-      if (type && path.extname(name).slice(1) !== type) {
+      if(type && path.extname(name).slice(1) !== type) {
         return next();
       }
       
