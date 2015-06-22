@@ -54,12 +54,14 @@ module.exports.build = function (config, minify, next, type) {
     async.eachSeries(assets[group], function (name, next) {
       var proc = module.exports.types[path.extname(name).slice(1)];
       var file = path.join(config.src, name);
-      if(type && path.extname(name).slice(1) !== type) {
-        if (!(path.extname(name).slice(1) === 'styl' && type === 'css')) {
-          return next();
-        }
+      var cssTypes = ['css', 'styl', 'stylus_import', 'less', 'less_import','nib'];
+      var jsTypes = ['js', 'handlebars', 'ember', 'coffeescript'];
+      if (type && type === 'css' && cssTypes.indexOf(path.extname(name).slice(1)) === -1) {
+        return next();
       }
-      
+      if (type && type === 'js' && jsTypes.indexOf(path.extname(name).slice(1)) === -1) {
+        return next();
+      }
       if (!proc) {
         return next('no type for ' + name);
       }
@@ -93,17 +95,17 @@ module.exports.build = function (config, minify, next, type) {
         }
         
         if (distcss) {
-          var hashcss = crypto.createHash('md5').update(distcss).digest('hex').slice(0, 10);
-          manifest.css[group] = config.str.css.replace('%%', config.web + '/dist-' + group + '.css');
-          manifest.all[group + '.css'] = 'dist-' + group + '.css';
-          fs.writeFile(path.join(config.out, 'dist-' + group + '.css'), distcss, f.wait());
+          var hashcss = type ? 'dist' : crypto.createHash('md5').update(distcss).digest('hex').slice(0, 10);
+          manifest.css[group] = config.str.css.replace('%%', config.web + '/' + hashcss + '-' + group + '.css');
+          manifest.all[group + '.css'] = hashcss + '-' + group + '.css';
+          fs.writeFile(path.join(config.out, hashcss + '-' + group + '.css'), distcss, f.wait());
         }
         
         if (distjs) {
-          var hashjs = crypto.createHash('md5').update(distjs).digest('hex').slice(0, 10);
-          manifest.js[group] = config.str.js.replace('%%', config.web + '/dist-' + group + '.js');
-          manifest.all[group + '.js'] = 'dist-' + group + '.js';
-          fs.writeFile(path.join(config.out, 'dist-' + group + '.js'), distjs, f.wait());
+          var hashjs = type ? 'dist' : crypto.createHash('md5').update(distjs).digest('hex').slice(0, 10);
+          manifest.js[group] = config.str.js.replace('%%', config.web + '/' + hashjs + '-' + group + '.js');
+          manifest.all[group + '.js'] = hashjs + '-' + group + '.js';
+          fs.writeFile(path.join(config.out, hashjs + '-' + group + '.js'), distjs, f.wait());
         }
       }).onComplete(next);
     });
