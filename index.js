@@ -9,8 +9,11 @@ module.exports.types = {
   , js: require('./types/js')
 };
 
-module.exports.build = function (config, minify, next) {
+module.exports.build = function (config, minify, next, type) {
   var assets = JSON.parse(fs.readFileSync(config, 'utf8'));
+  if (type) {
+    var originalManifest = JSON.parse(fs.readFileSync(path.join(assets._out, 'manifest.json'), 'utf8'));
+  }
   var manifest = {
       css: {}
     , js: {}
@@ -23,10 +26,25 @@ module.exports.build = function (config, minify, next) {
     , out: path.join(config, assets._out)
     , web: assets._web
     , str: {
-          css: (assets._str && assets._str.css) || '<link rel=\'stylesheet\' href=\'%%\'>'
-        , js: (assets._str && assets._str.js) || '<script src=\'%%\'></script>'
+        css: (assets._str && assets._str.css) || '<link rel=\'stylesheet\' href=\'%%\'>'
+      , js: (assets._str && assets._str.js) || '<script src=\'%%\'></script>'
       }
   };
+  if (type) {
+    manifest = originalManifest;
+    manifest[type] = {};
+    async.eachSeries(Object.keys(manifest.all), function (key, next) {
+      if (key.indexOf(type) >= 0) {
+        delete manifest.all[key];
+      };
+      next();
+    }, function(err) {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
+
   
   async.eachSeries(Object.keys(assets), function (group, next) {
     if (!Array.isArray(assets[group])) {
@@ -36,7 +54,14 @@ module.exports.build = function (config, minify, next) {
     async.eachSeries(assets[group], function (name, next) {
       var proc = module.exports.types[path.extname(name).slice(1)];
       var file = path.join(config.src, name);
-      
+      var cssTypes = ['css', 'styl', 'stylus', 'less','nib'];
+      var jsTypes = ['js', 'handlebars', 'hbs', 'coffee'];
+      if (type && type === 'css' && cssTypes.indexOf(path.extname(name).slice(1)) === -1) {
+        return next();
+      }
+      if (type && type === 'js' && jsTypes.indexOf(path.extname(name).slice(1)) === -1) {
+        return next();
+      }
       if (!proc) {
         return next('no type for ' + name);
       }
@@ -60,20 +85,26 @@ module.exports.build = function (config, minify, next) {
       }
       
       var f = ff(function () {
-        var distcss = manifest.css[group];
-        var distjs = manifest.js[group];
+        if (!type) {
+          var distcss = manifest.css[group];
+          var distjs = manifest.js[group];
+        } else if (type === 'css') {
+          var distcss = manifest.css[group];
+        } else if (type === 'js') {
+          var distjs = manifest.js[group];
+        }
         
         if (distcss) {
-          var hashcss = crypto.createHash('md5').update(distcss).digest('hex').slice(0, 10);
+          var hashcss = type ? 'dist' : crypto.createHash('md5').update(distcss).digest('hex').slice(0, 10);
           manifest.css[group] = config.str.css.replace('%%', config.web + '/' + hashcss + '-' + group + '.css');
-          manifest.all[group + '.css'] = hashcss;
+          manifest.all[group + '.css'] = type ? hashcss + '-' + group : hashcss;
           fs.writeFile(path.join(config.out, hashcss + '-' + group + '.css'), distcss, f.wait());
         }
         
         if (distjs) {
-          var hashjs = crypto.createHash('md5').update(distjs).digest('hex').slice(0, 10);
+          var hashjs = type ? 'dist' : crypto.createHash('md5').update(distjs).digest('hex').slice(0, 10);
           manifest.js[group] = config.str.js.replace('%%', config.web + '/' + hashjs + '-' + group + '.js');
-          manifest.all[group + '.js'] = hashjs;
+          manifest.all[group + '.js'] = type ? hashjs + '-' + group : hashjs;
           fs.writeFile(path.join(config.out, hashjs + '-' + group + '.js'), distjs, f.wait());
         }
       }).onComplete(next);
@@ -82,7 +113,6 @@ module.exports.build = function (config, minify, next) {
     if (err) {
       return next(err);
     }
-    
     fs.writeFile(path.join(config.out, 'manifest.json'), JSON.stringify(manifest), next);
   });
 };
