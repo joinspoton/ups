@@ -54,8 +54,8 @@ module.exports.build = function (config, minify, next, type) {
     async.eachSeries(assets[group], function (name, next) {
       var proc = module.exports.types[path.extname(name).slice(1)];
       var file = path.join(config.src, name);
-      var cssTypes = ['css', 'styl', 'stylus_import', 'less', 'less_import','nib'];
-      var jsTypes = ['js', 'handlebars', 'ember', 'coffeescript'];
+      var cssTypes = ['css', 'styl', 'stylus', 'less','nib'];
+      var jsTypes = ['js', 'handlebars', 'hbs', 'coffee'];
       if (type && type === 'css' && cssTypes.indexOf(path.extname(name).slice(1)) === -1) {
         return next();
       }
@@ -97,14 +97,14 @@ module.exports.build = function (config, minify, next, type) {
         if (distcss) {
           var hashcss = type ? 'dist' : crypto.createHash('md5').update(distcss).digest('hex').slice(0, 10);
           manifest.css[group] = config.str.css.replace('%%', config.web + '/' + hashcss + '-' + group + '.css');
-          manifest.all[group + '.css'] = hashcss + '-' + group + '.css';
+          manifest.all[group + '.css'] = type ? hashcss + '-' + group : hashcss;
           fs.writeFile(path.join(config.out, hashcss + '-' + group + '.css'), distcss, f.wait());
         }
         
         if (distjs) {
           var hashjs = type ? 'dist' : crypto.createHash('md5').update(distjs).digest('hex').slice(0, 10);
           manifest.js[group] = config.str.js.replace('%%', config.web + '/' + hashjs + '-' + group + '.js');
-          manifest.all[group + '.js'] = hashjs + '-' + group + '.js';
+          manifest.all[group + '.js'] = type ? hashjs + '-' + group : hashjs;
           fs.writeFile(path.join(config.out, hashjs + '-' + group + '.js'), distjs, f.wait());
         }
       }).onComplete(next);
